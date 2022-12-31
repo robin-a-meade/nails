@@ -1,0 +1,55 @@
+#!/bin/bash
+shopt -s extglob
+
+JARS=(
+  com.facebook:nailgun-server:1.0.1
+  com.facebook:nailgun-examples:1.0.1
+  net.java.dev.jna:jna:5.12.1
+  net.java.dev.jna:jna-platform:5.12.1
+  org.ccil.cowan.tagsoup:tagsoup:1.2.1
+  net.sf.saxon:Saxon-HE:11.4
+  jline:jline:2.14.6
+  org.xmlresolver:xmlresolver:4.5.2
+  com.github.jnr:jnr-posix:3.1.16
+  org.robin-a-meade:nails:0.1.0
+)
+
+JAVA_OPTS=()
+
+readonly MAIN_CLASS=com.facebook.nailgun.NGServer
+
+if pgrep -f 'java\b.*\bcom.facebook.nailgun.NGServer\b'; then
+  echo "The NailGun server is already running" >&2
+  exit 1
+fi
+
+: ${NAILGUN_SERVER:=local:/tmp/ngs}
+if [[ $NAILGUN_SERVER = local:* ]]; then
+  path_to_socket_file=${NAILGUN_SERVER#local:}
+  if [[ -e $path_to_socket_file ]]; then
+    echo "The socket file, $path_to_socket_file, already exists." >&2
+    echo "Removing the socket file, $path_to_socket_file" >&2
+    if rm "$path_to_socket_file"; then
+      echo "Removed the socket file, $path_to_socket_file" >&2
+    else
+      echo "Couldn't removed the socket file, $path_to_socket_file" >&2
+      exit 1
+    fi
+  fi
+fi
+
+set -- "$NAILGUN_SERVER"
+
+export NAILGUN_SERVER
+bash -c "
+sleep 1
+ng ng-alias push com.facebook.nailgun.examples.Stack
+ng ng-alias pop com.facebook.nailgun.examples.Stack
+#ng ng-alias ng-saxon-transform net.sf.saxon.Transform
+ng ng-alias ng-saxon-transform org.robin_a_meade.nails.SaxonTransform
+#ng ng-alias ng-tagsoup org.ccil.cowan.tagsoup.CommandLine
+ng ng-alias ng-tagsoup org.robin_a_meade.nails.Tagsoup
+ng ng-alias
+" inline-bash &
+
+source lmar.sh
