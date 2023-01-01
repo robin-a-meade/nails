@@ -1,6 +1,8 @@
-# Nails for NailGun (Tagsoup, net.sf.saxon.Transform)
+# Nails for NailGun ()
 
-This repo is for *nails* I write for [NailGun](https://github.com/facebook/nailgun).
+This repo is for *nails* for [NailGun](https://github.com/facebook/nailgun).
+
+Just Tagsoup and net.sf.saxon.Transform, so far.
 
 ## Resources about NailGun and for writing nails
 
@@ -11,19 +13,19 @@ This repo is for *nails* I write for [NailGun](https://github.com/facebook/nailg
 
 ## NailGun server supports UNIX domain socket
 
-Instead of specifying a IP address, specify a file like this `local:/tmp/ngs`. This is more secure because only you can read and write from that UNIX domain socket file.
+Instead of specifying an IP address, I recommend specifying a path to use for a UNIX domain socket, like this `local:/tmp/ngs`. This is more secure because UNIX file permissions can restrict read and write access to only  you.
 
-I export environment variable `NAILGUN_SERVER=local:/tmp/ngs` in my `.bash_profile`. The `ng` client respects this environment variable. This way I don't need to specify `--nailgun-server local:/tmp/ngs` with each client invocation.
+**Tip:** Export an environment variable like `NAILGUN_SERVER=local:/tmp/ngs` in your `.bash_profile`. The `ng` client respects this environment variable. This way you don't need to specify `--nailgun-server local:/tmp/ngs` with each client invocation.
 
 ## Considerations for writing nails
 
 ### Handle relative paths
 
-If you want relative paths to work when invoking a nail, write a wrapper class that converts any relative path arguments to absolute paths before passing them through to the regular main class. Otherwise, relative paths will resolve relative to the directory you started the NailGun server in!
+If you want relative paths to work when invoking a java class through the `ng` client, write a wrapper class that converts any relative path arguments to absolute paths before passing them through to the regular main class. Otherwise, relative paths will resolve relative to the directory you started the NailGun server in!
 
-### Enclose the nail in a try-catch block
+### Enclose the nail's main logic in a try-catch block
 
-Enclose the nail in a try-catch block that prints a stack trace if a Throwable is thrown. Otherwise, the client receives no feedback that an exception occurred! (There's a Pull Request that might address this: https://github.com/facebook/nailgun/pull/162.)
+Enclose the nail's main logic in a try-catch block and print a stack trace if a Throwable is thrown. Otherwise, the client receives no feedback that when an exception occurs! (There's a Pull Request that might address this: https://github.com/facebook/nailgun/pull/162.)
 
 ## ng-tagsoup (nail wrapper for org.ccil.cowan.tagsoup.CommandLine)
 
