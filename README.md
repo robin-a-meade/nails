@@ -21,11 +21,11 @@ Instead of specifying an IP address, I recommend specifying a path to use for a 
 
 ### Handle relative paths
 
-If you want relative paths to work when invoking a java class through the `ng` client, write a wrapper class that converts any relative path arguments to absolute paths before passing them through to the regular main class. Otherwise, relative paths will resolve relative to the directory you started the NailGun server in!
+If you want relative paths to work when invoking a java class through the `ng` client, write a wrapper class that converts any relative path arguments to absolute paths before passing them on to the regular main class. Otherwise, relative paths will resolve relative to the directory you started the NailGun server in!
 
 ### Enclose the nail's main logic in a try-catch block
 
-Enclose the nail's main logic in a try-catch block and print a stack trace if a Throwable is thrown. Otherwise, the client receives no feedback that when an exception occurs! (There's a Pull Request that might address this: https://github.com/facebook/nailgun/pull/162.)
+Enclose the nail's main logic in a try-catch block and print a stack trace if a `Throwable` is thrown. Otherwise, the client receives no feedback when an exception occurs! (There's a Pull Request that might address this: https://github.com/facebook/nailgun/pull/162.)
 
 ## ng-tagsoup (nail wrapper for org.ccil.cowan.tagsoup.CommandLine)
 
