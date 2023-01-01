@@ -1,4 +1,4 @@
-# Nails for NailGunx`
+# Nails for NailGun
 
 This repo is for *nails* for [NailGun](https://github.com/facebook/nailgun).
 
