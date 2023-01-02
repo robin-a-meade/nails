@@ -60,7 +60,7 @@ But in the discussion of issue#108 it is mentioned that NailGun can use UNIX Dom
 -  Limit access to the daemon to the same user #108  
    https://github.com/facebook/nailgun/issues/108
 
-Using a UNIX Domain Socket offers a higher degree of security than using a TCP/IP socket because UNIX file permissions on the path associated with the UNIX Domain Socket can retrict access to only the one user. No other users would be able to interact with the NailGun server. Contrast to using the default of `localhost` port `2113`; other users on the system would be able to access the NailGun server running at that address.
+Using a UNIX Domain Socket offers a higher degree of security than using a TCP/IP socket because UNIX file permissions on the UNIX Domain Socket file can retrict access to only the owner. No other users would be able to interact with the NailGun server. Contrast to using the default of `localhost` port `2113`; other users on the system would be able to access the NailGun server running at that address.
 
 To use a UNIX Domain Socket, specify the address like this `local:<path to use for the UNIX Domain Socket file>`. For example, `local:/tmp/ngs`.
 
