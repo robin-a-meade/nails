@@ -11,9 +11,64 @@ Just Tagsoup and net.sf.saxon.Transform, so far.
 - https://www.javadoc.io/doc/com.facebook/nailgun-server
 - https://github.com/facebook/nailgun 
 
-## NailGun server supports UNIX domain socket
+## NailGun can be used with UNIX Domain Sockets
 
-Instead of specifying an IP address, I recommend specifying a path to use for a UNIX domain socket, like this `local:/tmp/ngs`. This is more secure because UNIX file permissions can restrict read and write access to only  you.
+This isn't evident in the documentation or usage message, but NailGun supports using a UNIX Domain Socket instead of a TCP/IP Socket.
+
+Force the display of NGServer's usage message:
+
+```
+./mvnw exec:java -Dexec.mainClass=com.facebook.nailgun.NGServer -Dexec.args="blah blah blah"
+[...]
+Usage: java NGServer
+   or: java NGServer port
+   or: java NGServer IPAddress
+   or: java NGServer IPAddress:port
+   or: java NGServer IPAddress:port timeout
+```
+
+Display the client's usage message:
+
+```
+$ ng 
+NailGun v1.0.0
+
+Usage: ng class [--nailgun-options] [args]
+          (to execute a class)
+   or: ng alias [--nailgun-options] [args]
+          (to execute an aliased class)
+   or: alias [--nailgun-options] [args]
+          (to execute an aliased class, where "alias"
+           is both the alias for the class and a symbolic
+           link to the ng client)
+
+where options include:
+   --nailgun-D<name>=<value>   set/override a client environment variable
+   --nailgun-version           print product version and exit
+   --nailgun-showversion       print product version and continue
+   --nailgun-server            to specify the address of the nailgun server
+                               (default is NAILGUN_SERVER environment variable
+                               if set, otherwise localhost)
+   --nailgun-port              to specify the port of the nailgun server
+                               (default is NAILGUN_PORT environment variable
+                               if set, otherwise 2113)
+   --nailgun-filearg FILE      places the entire contents of FILE into the
+                               next argument, which is interpreted as a string
+                               using the server's default character set.  May be
+                               specified more than once.
+   --nailgun-help              print this message and exit
+```
+
+You see the usage messages make no mention of UNIX Domain Sockets. They mention only address and port.
+
+But in the discussion of issue#108 it is mentioned that NailGun can use UNIX Domain Sockets:
+
+-  Limit access to the daemon to the same user #108  
+   https://github.com/facebook/nailgun/issues/108
+
+Using a UNIX Domain Socket offers a higher degree of security than using a TCP/IP socket because UNIX file permissions on the path associated with the UNIX Domain Socket can retrict access to only the one user. No other users would be able to interact with the NailGun server. Contrast to using the default of `localhost` port `2113`; other users on the system would be able to access the NailGun server running at that address.
+
+To use a UNIX Domain Socket, specify the address like this `local:<path to use for the UNIX Domain Socket file>`. For example, `local:/tmp/ngs`.
 
 **Tip:** Export an environment variable like `NAILGUN_SERVER=local:/tmp/ngs` in your `.bash_profile`. The `ng` client respects this environment variable. This way you don't need to specify `--nailgun-server local:/tmp/ngs` with each client invocation.
 
@@ -27,7 +82,10 @@ If you want relative paths to work when invoking a java class through the `ng` c
 
 Enclose the nail's main logic in a try-catch block and print a stack trace if a `Throwable` is thrown. Otherwise, the client receives no feedback when an exception occurs! (There's a Pull Request that might address this: https://github.com/facebook/nailgun/pull/162.)
 
-## ng-tagsoup (nail wrapper for org.ccil.cowan.tagsoup.CommandLine)
+## ng-tagsoup
+This is a nail that wraps `org.ccil.cowan.tagsoup.CommandLine`.
+
+Reference links about tagsoup:
 
 - https://central.sonatype.dev/artifact/org.ccil.cowan.tagsoup/tagsoup/1.2.1
 - https://www.javadoc.io/doc/org.ccil.cowan.tagsoup/tagsoup/latest/index.html
@@ -56,7 +114,10 @@ curl https://en.wikipedia.org/wiki/XPath -o XPath.html
 ng-tagsoup XPath.html >XPath.xhtml
 ```
 
-## ng-saxon-transform (nail wrapper for net.sf.saxon.Transform)
+## ng-saxon-transform
+This is a nail that wraps `net.sf.saxon.Transform`.
+
+Reference links about `net.sf.saxon.Transform`:
 
 - https://www.saxonica.com/documentation11/#!using-xsl/commandline
 - https://saxonica.plan.io/projects/saxonmirrorhe/repository/he/revisions/he_mirror_saxon_11_4/entry/src/main/java/net/sf/saxon/Transform.java
@@ -115,3 +176,52 @@ ng-saxon-transform -s:XPath.xhtml -xsl:t.xsl
 ```
 
 ## Todo: Write a user Systemd service to start the NailGun server
+
+Create the unit file:
+
+```
+SYSTEMD_EDITOR=tee systemctl --user edit --full --force ngs.service << 'EOF'
+[Unit]
+Description=NailGun Server
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/ngs
+
+[Install]
+WantedBy=default.target
+EOF
+```
+
+Check that the unit file was property created:
+
+```
+systemctl --user cat ngs.service
+```
+
+Enable the service:
+
+```
+systemctl enable ngs.service
+```
+
+Start the service:
+
+```
+systemctl start ngs.service
+```
+
+Or, enable and start in one command:
+
+```
+systemctl enable --now ngs.service
+```
+
+The output can be seen in the journal:
+
+```
+journalctl -f
+```
+
+
+Optionally, install [Systemd Manager](https://extensions.gnome.org/extension/4174/systemd-manager/) extension if you want a GUI for controlling the service.
