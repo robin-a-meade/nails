@@ -13,9 +13,7 @@ Just Tagsoup and net.sf.saxon.Transform, so far.
 
 ## NailGun can be used with UNIX Domain Sockets
 
-This isn't evident in the documentation or usage message, but NailGun supports using a UNIX Domain Socket instead of a TCP/IP Socket.
-
-Force the display of NGServer's usage message:
+This isn't evident in the documentation or usage messages, but NailGun supports using a UNIX Domain Socket instead of a TCP/IP Socket.
 
 ```
 ./mvnw exec:java -Dexec.mainClass=com.facebook.nailgun.NGServer -Dexec.args="blah blah blah"
@@ -26,8 +24,6 @@ Usage: java NGServer
    or: java NGServer IPAddress:port
    or: java NGServer IPAddress:port timeout
 ```
-
-Display the client's usage message:
 
 ```
 $ ng 
@@ -58,8 +54,6 @@ where options include:
                                specified more than once.
    --nailgun-help              print this message and exit
 ```
-
-You see the usage messages make no mention of UNIX Domain Sockets. They mention only address and port.
 
 But in the discussion of issue#108 it is mentioned that NailGun can use UNIX Domain Sockets:
 
@@ -224,4 +218,4 @@ journalctl -f
 ```
 
 
-Optionally, install [Systemd Manager](https://extensions.gnome.org/extension/4174/systemd-manager/) extension if you want a GUI for controlling the service.
+Optionally, install [Systemd Manager](https://extensions.gnome.org/extension/4174/systemd-manager/) Gnome extension if you want a GUI for controlling the service.
