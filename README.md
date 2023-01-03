@@ -85,6 +85,8 @@ Reference links about tagsoup:
 
 - https://central.sonatype.dev/artifact/org.ccil.cowan.tagsoup/tagsoup/1.2.1
 - https://www.javadoc.io/doc/org.ccil.cowan.tagsoup/tagsoup/latest/index.html
+- https://github.com/jukka/tagsoup  
+  (This fork seems to be what gets published to Maven Central. Note the  last commit message, in 2011: *"Add settings for Maven Central deployment"*)
 
 A symbolic link named `ng-tagsoup` should be created:
 ```
@@ -109,6 +111,10 @@ cd "$(mktemp -d)"
 curl https://en.wikipedia.org/wiki/XPath -o XPath.html
 ng-tagsoup XPath.html >XPath.xhtml
 ```
+
+**PROBLEM:** The main class, [org.ccil.cowan.tagsoup.CommandLine](https://github.com/jukka/tagsoup/blob/master/src/java/org/ccil/cowan/tagsoup/CommandLine.java), is not reentrant. The options are stored in a static Hashtable. Thus the option values will be remembered between runs.
+
+**WORKAROUND:** Luckily, the options Hashtable is *package-private*, not *private*. Thus we are able to create a new class in the `org.ccil.cowan.tagsoup` package that can re-initialize the options Hashtable. See the call to `org.ccil.cowan.tagsoup.CommandLineFix.reinitializeOptions()` in `org.robin_a_meade.nails.Tagsoup`.
 
 ## ng-saxon-transform
 This is a nail that wraps `net.sf.saxon.Transform`.
