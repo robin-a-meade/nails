@@ -188,8 +188,7 @@ Reference links about `net.sf.saxon.Query`:
 A symbolic link named `ng-saxon-query` should be created:
 ```
 cd ~/.local/bin
-
-
+ln -s /usr/local/bin/ng ng-saxon-query
 ```
 
 A `ng-alias` named `ng-saxon-query` should be created:
