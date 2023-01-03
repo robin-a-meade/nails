@@ -1,7 +1,43 @@
 #!/bin/bash
 shopt -s extglob
 
-JARS=(
+# We'll use our run_with_maven.sh helper script to handle dependencies, build
+# the classpath, and, finally, execute the main class. Use of this helper
+# script requires that we set the following shell variables:
+#
+#   * DEPENDENCIES - an array of Maven dependencies in
+#     groupId:artifactId:version (GAV) notation. The run_with_maven.sh script
+#     will utilize maven functionality to ensure that these dependencies, as
+#     well as any transtive dependencies, are present in the local maven cache,
+#     ~/.m2/repository, downloading them from Maven Central if necessary.
+#
+#   * MAIN_CLASS - the class to be executed. It must have a `public static void
+#     (String[] args)` method.
+#
+# Optionally, the following shell variables may also be set:
+#
+#   * JAVA_OPTS - an array of any JVM options you want set
+#
+#   * JAVA_HOME - location of the JRE to use. The default behavior is to use whichever
+#     java is on the PATH.
+#
+#   * MAIN_CLASS_ARGS - Arguments to provide to the main class. These are in
+#     addition to the arguments provided to the calling script.
+#
+# In summary, the main class gets called like this:
+#
+#    "$JAVACMD" "${JAVA_OPTS[@]}" \
+#      -classpath "$(IFS=:; echo "${classpath_overall[*]}")" \
+#      "${MAIN_CLASS}" "${MAIN_CLASS_ARGS[@]}" "$@"
+#
+# NOTE: The classpath calculation is expensive. It gets cached at
+# `${XDG_CACHE_HOME:-$HOME/.cache}/<scriptname>.classpath`. If you add
+# dependencies, or change their versions, it is necessary to remove that cache
+# file to force the helper script to recalculate the classpath.  As a
+# convenience, specifying the --clear-classpath option will remove this cache
+# file for you.
+#
+DEPENDENCIES=(
   com.facebook:nailgun-server:1.0.1
   com.facebook:nailgun-examples:1.0.1
   net.java.dev.jna:jna:5.12.1
@@ -14,7 +50,11 @@ JARS=(
   org.robin-a-meade:nails:0.1.0
 )
 
-JAVA_OPTS=()
+# Add the -server option to select the HotSpot JVM.
+# This probably doesn't make a difference because discussion here says
+# the HotSpot JVM is used by default on 64-bit systems for several years.
+# https://stackoverflow.com/questions/198577/real-differences-between-java-server-and-java-client
+JAVA_OPTS=(-server)
 
 readonly MAIN_CLASS=com.facebook.nailgun.NGServer
 
@@ -41,15 +81,32 @@ fi
 set -- "$NAILGUN_SERVER"
 
 export NAILGUN_SERVER
-bash -c "
-sleep 1
-ng ng-alias push com.facebook.nailgun.examples.Stack
-ng ng-alias pop com.facebook.nailgun.examples.Stack
-#ng ng-alias ng-saxon-transform net.sf.saxon.Transform
-ng ng-alias ng-saxon-transform org.robin_a_meade.nails.SaxonTransform
-#ng ng-alias ng-tagsoup org.ccil.cowan.tagsoup.CommandLine
-ng ng-alias ng-tagsoup org.robin_a_meade.nails.Tagsoup
-ng ng-alias
-" inline-bash &
 
-source lmar.sh
+# We run this initialization block in a separate child process
+# We sleep for 1 second to give the server time to start
+{
+  count_attempts=0
+  for (( count_attempts = 1 ; count_attempts <= 30 ; count_attempts++ )); do
+    sleep 1
+    echo "Initiating attempt $count_attempts to connect to the server..."
+    if ng ng-version; then
+      echo "Successly connected to the server after $count_attempts attempts"
+      break
+    else
+      echo "Failed to connect to the server on attempt $count_attempts"
+    fi
+  done
+  if [[ count_attempts = 31 ]]; then
+    echo "error: timeout: NailGun server didn't start after 30 seconds"
+    exit
+  fi
+  ng ng-alias push com.facebook.nailgun.examples.Stack
+  ng ng-alias pop com.facebook.nailgun.examples.Stack
+  #ng ng-alias ng-saxon-transform net.sf.saxon.Transform
+  ng ng-alias ng-saxon-transform org.robin_a_meade.nails.SaxonTransform
+  #ng ng-alias ng-tagsoup org.ccil.cowan.tagsoup.CommandLine
+  ng ng-alias ng-tagsoup org.robin_a_meade.nails.Tagsoup
+  ng ng-alias
+} &
+
+source run_with_maven.sh

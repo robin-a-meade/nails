@@ -87,7 +87,7 @@ Reference links about tagsoup:
 A symbolic link named `ng-tagsoup` should be created:
 ```
 cd ~/.local/bin
-ln -s ng-tagsoup /usr/local/bin/ng
+ln -s /usr/local/bin/ng ng-tagsoup
 ```
 
 A `ng-alias` named `ng-tagsoup` should be created:
@@ -119,7 +119,7 @@ Reference links about `net.sf.saxon.Transform`:
 A symbolic link named `ng-saxon-transform` should be created:
 ```
 cd ~/.local/bin
-ln -s ng-saxon-transform /usr/local/bin/ng
+ln -s /usr/local/bin/ng ng-saxon-transform
 ```
 
 A `ng-alias` named `ng-saxon-transform` should be created:
@@ -169,7 +169,55 @@ ng-tagsoup XPath.html >XPath.xhtml
 ng-saxon-transform -s:XPath.xhtml -xsl:t.xsl
 ```
 
-## Todo: Write a user Systemd service to start the NailGun server
+## ng-saxon-query
+This is a nail that wraps `net.sf.saxon.Query`.
+
+Reference links about `net.sf.saxon.Query`:
+
+- https://www.saxonica.com/documentation11/#!using-xquery/commandline
+- https://saxonica.plan.io/projects/saxonmirrorhe/repository/he/revisions/he_mirror_saxon_11_4/entry/src/main/java/net/sf/saxon/Query.java
+
+A symbolic link named `ng-saxon-query` should be created:
+```
+cd ~/.local/bin
+
+
+```
+
+A `ng-alias` named `ng-saxon-query` should be created:
+```
+ng-alias ng-saxon-query org.robin_a_meade.nails.SaxonQuery
+```
+
+Then `ng-saxon-query` should work:
+
+```bash
+curl https://en.wikipedia.org/wiki/XPath \
+  | ng-tagsoup \
+  | ng-saxon-query -s:- -q:q.xquery
+```
+
+The following `t.xsl` stylesheet can be used for a simple test:
+
+`q.xquery`
+```none
+declare boundary-space preserve;
+declare default element namespace "http://www.w3.org/1999/xhtml";
+declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+declare option output:method 'text';
+declare option output:item-separator '&#x0A;';
+//p/b
+```
+
+Test that relative paths work:
+```bash
+cd "$(mktemp -d)"
+curl https://en.wikipedia.org/wiki/XPath -o XPath.html
+ng-tagsoup XPath.html >XPath.xhtml
+ng-saxon-query -s:XPath.xhtml -q:q.xquery
+```
+
+## Define a user systemd service for the NailGun server
 
 Create the unit file:
 
@@ -217,5 +265,4 @@ The output can be seen in the journal:
 journalctl -f
 ```
 
-
-Optionally, install [Systemd Manager](https://extensions.gnome.org/extension/4174/systemd-manager/) Gnome extension if you want a GUI for controlling the service.
+Optionally, install the [Systemd Manager](https://extensions.gnome.org/extension/4174/systemd-manager/) Gnome extension. It provides a GUI for controlling systemd services.

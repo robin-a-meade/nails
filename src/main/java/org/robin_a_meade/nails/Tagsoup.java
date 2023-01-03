@@ -11,7 +11,11 @@ public class Tagsoup {
       String[] args = context.getArgs();
       for (int i = 0; i < args.length; i++) {
         String arg = args[i];
-        if (!arg.startsWith("/")) {
+        if (arg.startsWith("/")) {
+          // Is an absolute path. Pass it through.
+        } else if (arg.startsWith("--")) {
+          // Is an option. Pass it through.
+        } else {
           args[i] = workingDirectory + "/" + arg;
         }
       }
