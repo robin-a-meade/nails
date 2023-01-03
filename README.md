@@ -13,7 +13,7 @@ Just Tagsoup and net.sf.saxon.Transform, so far.
 
 ## NailGun can be used with UNIX Domain Sockets
 
-This isn't evident in the documentation or usage messages, but NailGun supports using a UNIX Domain Socket instead of a TCP/IP Socket.
+This isn't evident in the documentation or usage messages, but NailGun supports using UNIX Domain Socket instead of TCP/IP Sockets.
 
 ```
 ./mvnw exec:java -Dexec.mainClass=com.facebook.nailgun.NGServer -Dexec.args="blah blah blah"
@@ -55,14 +55,16 @@ where options include:
    --nailgun-help              print this message and exit
 ```
 
-But in the discussion of issue#108 it is mentioned that NailGun can use UNIX Domain Sockets:
+This is mentioned in the discussion of issue#108:
 
 -  Limit access to the daemon to the same user #108  
    https://github.com/facebook/nailgun/issues/108
 
-Using a UNIX Domain Socket offers a higher degree of security than using a TCP/IP socket because UNIX file permissions on the UNIX Domain Socket file can retrict access to only the owner. No other users would be able to interact with the NailGun server. Contrast to using the default of `localhost` port `2113`; other users on the system would be able to access the NailGun server running at that address.
+Using a UNIX Domain Socket offers a higher degree of security than using a TCP/IP socket because UNIX file permissions on the UNIX Domain Socket file can retrict access to only the owner. No other users would have access to the NailGun server. Contrast to using the default of `localhost` port `2113`; other users on the system would be able to access the NailGun server running at that localhost port.
 
 To use a UNIX Domain Socket, specify the address like this `local:<path to use for the UNIX Domain Socket file>`. For example, `local:/tmp/ngs`.
+
+**Warning:** Make sure you set a restrictive umask value of 077.
 
 **Tip:** Export an environment variable like `NAILGUN_SERVER=local:/tmp/ngs` in your `.bash_profile`. The `ng` client respects this environment variable. This way you don't need to specify `--nailgun-server local:/tmp/ngs` with each client invocation.
 
