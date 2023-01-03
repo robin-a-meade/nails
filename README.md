@@ -13,7 +13,7 @@ Just Tagsoup and net.sf.saxon.Transform, so far.
 
 ## NailGun can be used with UNIX Domain Sockets
 
-This isn't evident in the documentation or usage messages, but NailGun supports using UNIX Domain Socket instead of TCP/IP Sockets.
+This isn't evident in the documentation or usage messages, but NailGun supports using UNIX Domain Sockets instead of TCP/IP Sockets.
 
 ```
 ./mvnw exec:java -Dexec.mainClass=com.facebook.nailgun.NGServer -Dexec.args="blah blah blah"
@@ -64,7 +64,7 @@ Using a UNIX Domain Socket offers a higher degree of security than using a TCP/I
 
 To use a UNIX Domain Socket, specify the address like this `local:<path to use for the UNIX Domain Socket file>`. For example, `local:/tmp/ngs`.
 
-**Warning:** Make sure you set a restrictive umask value of 077.
+**Warning:** Make sure you set a restrictive umask value of 077 before launching the server. See the example `bin/ngs` script included in this project.
 
 **Tip:** Export an environment variable like `NAILGUN_SERVER=local:/tmp/ngs` in your `.bash_profile`. The `ng` client respects this environment variable. This way you don't need to specify `--nailgun-server local:/tmp/ngs` with each client invocation.
 
