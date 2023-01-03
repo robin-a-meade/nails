@@ -78,6 +78,7 @@ if [[ $NAILGUN_SERVER = local:* ]]; then
   fi
 fi
 
+umask 077
 set -- "$NAILGUN_SERVER"
 
 export NAILGUN_SERVER
@@ -102,10 +103,12 @@ export NAILGUN_SERVER
   fi
   ng ng-alias push com.facebook.nailgun.examples.Stack
   ng ng-alias pop com.facebook.nailgun.examples.Stack
-  #ng ng-alias ng-saxon-transform net.sf.saxon.Transform
-  ng ng-alias ng-saxon-transform org.robin_a_meade.nails.SaxonTransform
   #ng ng-alias ng-tagsoup org.ccil.cowan.tagsoup.CommandLine
   ng ng-alias ng-tagsoup org.robin_a_meade.nails.Tagsoup
+  #ng ng-alias ng-saxon-transform net.sf.saxon.Transform
+  ng ng-alias ng-saxon-transform org.robin_a_meade.nails.SaxonTransform
+  #ng ng-alias ng-saxon-transform net.sf.saxon.Query
+  ng ng-alias ng-saxon-query org.robin_a_meade.nails.SaxonQuery
   ng ng-alias
 } &
 
