@@ -101,15 +101,71 @@ export NAILGUN_SERVER
     echo "error: timeout: NailGun server didn't start after 30 seconds"
     exit
   fi
+
+  symlink () {
+    if [[ ! -e ~/.local/bin/$1 ]]; then
+      ln -s /usr/local/bin/ng ~/.local/bin/"$1"
+    fi
+  }
+
+  # Official examples from the NailGun project
+  ng ng-alias ng-binary-echo com.facebook.nailgun.examples.BinaryEcho
+  ng ng-alias ng-dump-all com.facebook.nailgun.examples.DumpAll
+  ng ng-alias ng-echo com.facebook.nailgun.examples.Echo
+  ng ng-alias ng-exit com.facebook.nailgun.examples.Exit
+  ng ng-alias ng-hash com.facebook.nailgun.examples.Hash
+  ng ng-alias ng-heartbeat com.facebook.nailgun.examples.Heartbeat
+  ng ng-alias ng-hello-world com.facebook.nailgun.examples.HelloWorld
+  ng ng-alias ng-prompt com.facebook.nailgun.examples.Prompt
   ng ng-alias push com.facebook.nailgun.examples.Stack
   ng ng-alias pop com.facebook.nailgun.examples.Stack
+  ng ng-alias ng-thread-test com.facebook.nailgun.examples.ThreadTest
+
+  # A couple of toy Nails for testing behavior
+  ng ng-alias ng-diag org.robin_a_meade.nails.NailDiag
+  ng ng-alias ng-prepend org.robin_a_meade.nails.Prepend
+
+  # Tagsoup
   #ng ng-alias ng-tagsoup org.ccil.cowan.tagsoup.CommandLine
   ng ng-alias ng-tagsoup org.robin_a_meade.nails.Tagsoup
+
+  # Saxon XSLT
   #ng ng-alias ng-saxon-transform net.sf.saxon.Transform
   ng ng-alias ng-saxon-transform org.robin_a_meade.nails.SaxonTransform
+
+  # Saxon XQuery
   #ng ng-alias ng-saxon-transform net.sf.saxon.Query
   ng ng-alias ng-saxon-query org.robin_a_meade.nails.SaxonQuery
+
+  # For each ng-alias, we make a symbolic link (if not already existing)
+  # Built-in aliases
+  symlink ng-alias
+  symlink ng-cp
+  symlink ng-stats
+  symlink ng-stop
+  symlink ng-version
+  # Official examples from the NailGun project
+  symlink ng-binary-echo
+  symlink ng-dump-all
+  symlink ng-echo
+  symlink ng-exit
+  symlink ng-hash
+  symlink ng-heartbeat
+  symlink ng-hello-world
+  symlink ng-prompt
+  symlink ng-push
+  symlink ng-pop
+  symlink ng-thread-test
+  # Mine
+  symlink ng-diag
+  symlink ng-prepend
+  symlink ng-tagsoup
+  symlink ng-saxon-transform
+  symlink ng-saxon-query
+
+  # List all defined aliases
   ng ng-alias
 } &
 
+echo "About to source run_with_maven.sh"
 source run_with_maven.sh
